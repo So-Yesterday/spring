@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.springframework'
+version = '5.3.30'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 正确依赖 Spring 模块（使用英文冒号，去掉分号）
+    implementation(project(":spring-beans"))      // ✅
+    implementation(project(":spring-core"))       // ✅
+    implementation(project(":spring-context"))    // ✅
+
+    // 测试依赖
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+// 添加以下配置：跳过 JFR 相关代码
+sourceSets {
+    main {
+        java {
+            exclude '**/metrics/jfr/**'  // 排除所有 JFR 相关文件
+        }
+    }
+}
