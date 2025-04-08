@@ -110,7 +110,9 @@ abstract class ConfigurationClassUtils {
 		}
 		else {
 			try {
+				// 根据class读取类的属性这里可以研究下TODO
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
+				logger.info("checkConfigurationClassCandidate读取的class信息: metadataReader");
 				metadata = metadataReader.getAnnotationMetadata();
 			}
 			catch (IOException ex) {
@@ -122,6 +124,7 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// 类上标注的注解Configuration ==>找到JavaConfig配置类
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);

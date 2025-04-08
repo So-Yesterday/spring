@@ -80,6 +80,7 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
+			// 启动时手动加入的BeanFactory,一般是空
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
@@ -91,11 +92,9 @@ final class PostProcessorRegistrationDelegate {
 					regularPostProcessors.add(postProcessor);
 				}
 			}
+			// 执行BeanFactoryPostProcessor. 可以找到 ConfigurationClassPostProcessor,这里解析配置类
+			// 实现PriorityOrdered, Ordered,和普通BeanDefinitionRegistryPostProcessor开始执行
 
-			// Do not initialize FactoryBeans here: We need to leave all regular beans
-			// uninitialized to let the bean factory post-processors apply to them!
-			// Separate between BeanDefinitionRegistryPostProcessors that implement
-			// PriorityOrdered, Ordered, and the rest.
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.

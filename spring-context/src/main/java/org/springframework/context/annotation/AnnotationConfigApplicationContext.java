@@ -88,7 +88,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		// 1. 初始化AnnotatedBeanDefinitionReader 和 ClassPathBeanDefinitionScanner
+		// 注册核心后置处理器：ConfigurationClassPostProcessor,AutowiredAnnotationBeanPostProcessor,CommonAnnotationBeanPostProcessor
 		this();
+		//注册当前配置类
 		register(componentClasses);
 		refresh();
 	}

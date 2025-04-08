@@ -18,6 +18,10 @@ dependencies {
     // 测试依赖
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // 添加 Logback 作为日志实现（SLF4J + Logback）
+//    implementation 'ch.qos.logback:logback-classic:1.2.11'
+//    implementation 'org.slf4j:jcl-over-slf4j:1.7.36' // 将 JCL 桥接到 SLF4J
 }
 // 添加以下配置：跳过 JFR 相关代码
 sourceSets {
