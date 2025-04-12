@@ -55,6 +55,10 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 	 */
 	public AnnotatedGenericBeanDefinition(Class<?> beanClass) {
 		setBeanClass(beanClass);
+		// 使用 StandardAnnotationMetadata 收集类的注解信息
+		// 这个过程会：
+		// 1. 创建 StandardAnnotationMetadata 实例
+		// 2. 使用 MergedAnnotations 收集所有注解
 		this.metadata = AnnotationMetadata.introspect(beanClass);
 	}
 
