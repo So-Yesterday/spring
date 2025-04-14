@@ -563,25 +563,29 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// 执行beanFactory的postProcessor,
 				// ConfigurationClassPostProcessor 解析配置类包扫描
-				// PropertySourcesPlaceholderConfigurer 替换${}
+				// PropertySourcesPlaceholderConfigurer 替换${} 后续理解环境变量实现
 				invokeBeanFactoryPostProcessors(beanFactory);
 
+				// 注册容器中beanPostProcessor
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
-				// Initialize message source for this context.
+				// 是否自定义messageSource  国际化
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
+				// SimpleApplicationEventMulticaster 默认实现 广播按监听器书序执行
+				// AsyncApplicationEventMulticaster 异步广播 线程池执行
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
+				// 模版方法模式
+				// Web 服务器启动（如 ServletWebServerApplicationContext 内嵌 Tomcat）
+				//特殊环境初始化（如 Kafka 消费者、定时任务线程池）
 				onRefresh();
 
-				// Check for listener beans and register them.
+				// 注册listeners
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
+				// 提前实例化单例bean
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
@@ -874,18 +878,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void registerListeners() {
 		// Register statically specified listeners first.
+		// 1. 注册静态指定的监听器（通过addApplicationListener()手动添加的）
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
-		// Do not initialize FactoryBeans here: We need to leave all regular beans
-		// uninitialized to let post-processors apply to them!
+	    // 2. 自动检测并注册容器中的监听器Bean
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
-		// Publish early application events now that we finally have a multicaster...
+		// 3. 发布早期积压的事件
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
@@ -900,33 +904,31 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * initializing all remaining singleton beans.
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-		// Initialize conversion service for this context.
+		// bean属性类型转化
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
-		// Register a default embedded value resolver if no BeanFactoryPostProcessor
-		// (such as a PropertySourcesPlaceholderConfigurer bean) registered any before:
-		// at this point, primarily for resolution in annotation attribute values.
+		// 2. 注册默认的嵌入式值解析器（处理占位符${...}）
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
-		// Initialize LoadTimeWeaverAware beans early to allow for registering their transformers early.
+		// 3. 初始化LoadTimeWeaverAware Bean（AOP相关）
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
 		}
 
-		// Stop using the temporary ClassLoader for type matching.
+		// 4. 停止使用临时类加载器
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes.
+		// 5. 冻结所用的bean定义
 		beanFactory.freezeConfiguration();
 
-		// Instantiate all remaining (non-lazy-init) singletons.
+		// 6. 初始化非懒加载单例Bean
 		beanFactory.preInstantiateSingletons();
 	}
 
