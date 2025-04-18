@@ -245,7 +245,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @throws BeansException if the bean could not be created
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T> T doGetBean(
+	protected <T> T  doGetBean(
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
@@ -267,6 +267,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
+		// 三级缓存中都空 开始走创建逻辑
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
@@ -328,10 +329,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 
-				// Create bean instance.
+				// 创建单例bean
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							// 开始创建bean
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
