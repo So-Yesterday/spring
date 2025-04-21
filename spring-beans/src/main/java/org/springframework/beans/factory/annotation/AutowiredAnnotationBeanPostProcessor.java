@@ -459,6 +459,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
+					//构建注入点
 					metadata = buildAutowiringMetadata(clazz);
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
@@ -475,6 +476,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		final List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
 		Class<?> targetClass = clazz;
 
+		// 字段注入和方法注入
 		do {
 			final List<InjectionMetadata.InjectedElement> fieldElements = new ArrayList<>();
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
@@ -694,6 +696,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			}
 			if (value != null) {
 				ReflectionUtils.makeAccessible(field);
+				// 反射设置值
 				field.set(bean, value);
 			}
 		}

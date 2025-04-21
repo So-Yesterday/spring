@@ -939,19 +939,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@SuppressWarnings("deprecation")
 	protected void finishRefresh() {
-		// Clear context-level resource caches (such as ASM metadata from scanning).
+
 		clearResourceCaches();
 
-		// Initialize lifecycle processor for this context.
+		// 1. 初始化生命周期处理器
 		initLifecycleProcessor();
 
-		// Propagate refresh to lifecycle processor first.
+		// 2. 启动所有实现了Lifecycle接口的Bean
 		getLifecycleProcessor().onRefresh();
 
-		// Publish the final event.
+		// 3. 发布ContextRefreshedEvent事件
 		publishEvent(new ContextRefreshedEvent(this));
 
-		// Participate in LiveBeansView MBean, if active.
+		// 4. 参与JMX注册（如果启用）
 		if (!NativeDetector.inNativeImage()) {
 			LiveBeansView.registerApplicationContext(this);
 		}
