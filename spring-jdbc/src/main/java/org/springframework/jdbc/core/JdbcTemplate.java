@@ -371,10 +371,12 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	// Methods dealing with static SQL (java.sql.Statement)
 	//-------------------------------------------------------------------------
 
+
 	@Nullable
 	private <T> T execute(StatementCallback<T> action, boolean closeResources) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
 
+		// JDBC
 		Connection con = DataSourceUtils.getConnection(obtainDataSource());
 		Statement stmt = null;
 		try {
