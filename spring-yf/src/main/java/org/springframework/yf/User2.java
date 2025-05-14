@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class User2 {
 	@Resource
 	private JdbcTemplate jdbcTemplate;
 
+	@Transactional
 	public User getUser() {
 		String sql = "SELECT * FROM ds_user WHERE id = ?";
 		Map<String, Object> stringObjectMap = jdbcTemplate.queryForObject(sql, new ColumnMapRowMapper(), 1);
