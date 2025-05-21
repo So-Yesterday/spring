@@ -499,10 +499,14 @@ public class DispatcherServlet extends FrameworkServlet {
 		initMultipartResolver(context);
 		initLocaleResolver(context);
 		initThemeResolver(context);
+		//  HandlerMappings
 		initHandlerMappings(context);
+		// HandlerAdapters
 		initHandlerAdapters(context);
+		// 异常处理
 		initHandlerExceptionResolvers(context);
 		initRequestToViewNameTranslator(context);
+		// ViewResolvers
 		initViewResolvers(context);
 		initFlashMapManager(context);
 	}
@@ -609,8 +613,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Ensure we have at least one HandlerMapping, by registering
-		// a default HandlerMapping if no other mappings are found.
+		// 默认的创建
 		if (this.handlerMappings == null) {
 			this.handlerMappings = getDefaultStrategies(context, HandlerMapping.class);
 			if (logger.isTraceEnabled()) {
@@ -874,6 +877,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// DispatcherServlet.properties 配置的 strategyInterface
 		String key = strategyInterface.getName();
 		String value = defaultStrategies.getProperty(key);
 		if (value != null) {
@@ -924,6 +928,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// Tomcat 转发到  SpringMVC
 		logRequest(request);
 
 		// Keep a snapshot of the request attributes in case of an include,
@@ -1044,14 +1049,26 @@ public class DispatcherServlet extends FrameworkServlet {
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
-				// Determine handler for the current request.
+				// 根据请求获取handler执行链
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
-				// Determine handler adapter for the current request.
+				// 根据执行链获取handler适配器, 获取执行链中的适配器
+				// 3种适配器
+				//HttpRequestHandlerAdapter
+				//处理实现 HttpRequestHandler 接口的处理器。
+
+				//用于直接处理请求而不返回视图名称的情况。
+				//SimpleControllerHandlerAdapter
+
+				//处理实现 Controller 接口的处理器。
+				//通常用于传统的 Spring MVC 控制器。
+
+				//RequestMappingHandlerAdapter
+				//处理使用 @RequestMapping 注解的方法。
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1064,11 +1081,12 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				//  HandlerInterceptor.preHandler
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
-				// Actually invoke the handler.
+				// 真正执行的controller-method
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1261,6 +1279,13 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Nullable
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 1. RequestMappingHandlerMapping
+		//作用: 支持基于 @RequestMapping 注解的控制器方法映射。
+		//适用场景: 最常用的 HandlerMapping，适用于现代 Spring MVC 应用中使用 @Controller 和 @RequestMapping 注解定义的控制器。
+		//默认优先级: 高于传统方式的 BeanNameUrlHandlerM
+
+		// BeanNameUrlHandlerMapping  xml配置方式
+
 		if (this.handlerMappings != null) {
 			for (HandlerMapping mapping : this.handlerMappings) {
 				HandlerExecutionChain handler = mapping.getHandler(request);

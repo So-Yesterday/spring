@@ -148,7 +148,8 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	@Override
 	public final void init() throws ServletException {
 
-		// Set bean properties from init parameters.
+		// tomcat启动时调用到该init方法
+		// 解析init-param
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
@@ -166,7 +167,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 			}
 		}
 
-		// Let subclasses do whatever initialization they like.
+		// 初始化逻辑
 		initServletBean();
 	}
 
