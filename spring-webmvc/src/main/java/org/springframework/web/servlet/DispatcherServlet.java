@@ -499,10 +499,14 @@ public class DispatcherServlet extends FrameworkServlet {
 		initMultipartResolver(context);
 		initLocaleResolver(context);
 		initThemeResolver(context);
+		//  HandlerMappings
 		initHandlerMappings(context);
+		// HandlerAdapters
 		initHandlerAdapters(context);
+		// 异常处理
 		initHandlerExceptionResolvers(context);
 		initRequestToViewNameTranslator(context);
+		// ViewResolvers
 		initViewResolvers(context);
 		initFlashMapManager(context);
 	}
@@ -609,8 +613,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// Ensure we have at least one HandlerMapping, by registering
-		// a default HandlerMapping if no other mappings are found.
+		// 默认的创建
 		if (this.handlerMappings == null) {
 			this.handlerMappings = getDefaultStrategies(context, HandlerMapping.class);
 			if (logger.isTraceEnabled()) {
@@ -874,6 +877,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
+		// DispatcherServlet.properties 配置的 strategyInterface
 		String key = strategyInterface.getName();
 		String value = defaultStrategies.getProperty(key);
 		if (value != null) {
@@ -924,6 +928,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// Tomcat 转发到  SpringMVC
 		logRequest(request);
 
 		// Keep a snapshot of the request attributes in case of an include,
@@ -1051,7 +1056,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
-				// Determine handler adapter for the current request.
+				// 获取处理器适配器
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
